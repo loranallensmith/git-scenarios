@@ -4,20 +4,15 @@
 # When run, this will create a new repository within which you can do a soft
 # reset to combine many commits into a single one.
 
-require 'git'
+require 'gitmethere'
 
 if Dir.exists?('git-reset-soft')
   puts "It looks like you have a directory called 'git-reset-soft' in this directory.\nPlease delete it first and then try running this script again."
   exit
 end
 
-
-# Initialize an empty git repository called git-reset-soft
-g = Git.init('git-reset-soft')
-
-
-# Create a README.md file and commit it to the repository
-readme_text = "# Git Reset (soft)
+name = 'git-reset-soft'
+explanation = "# Git Reset (soft)
 
   When you are working a feature or bug, you will often find it helpful to create frequent commits that track your overall progress.  When it is time to share your changes, however, you may not want each step to appear in the history of the project.  Using the command `git reset --soft` allows you to step backwards in your commit history while leaving your working directory and staging area intact so you can combine all of those commits into a single snapshot.
 
@@ -25,12 +20,9 @@ readme_text = "# Git Reset (soft)
 
   This repository contains files that each represent a finished component of a kitchen remodel.  You have a branch called `flooring` that contains individual commits for each step of the flooring process.  If you run `git reset --soft HEAD~5`, Git will rewind your commit history, leaing all of the changes those commits introduced intact and staged.  From there, you can run `git commit -m 'Add flooring'` to combine all of those individual changes into a single commit."
 
-File.open('git-reset-soft/README.md', 'w') do | f |
-  f.puts readme_text
-end
 
-g.add
-g.commit('Initial commit')
+# Initialize an empty git repository
+scenario = GitMeThere::Scenario.new(name, explanation)
 
 initial_commit_id = g.log.first.sha[0..6]
 
@@ -49,26 +41,17 @@ appliances_to_add = [
 ]
 
 appliances_to_add.each do | file |
-
-  File.open("git-reset-soft/#{file['name']}.md", 'w') do | f |
-    f.puts "#{file['content']}"
-  end
-
-  g.add
-
-  g.commit("Add #{file['name']}")
-
+  scenario.create_file(file['name'], file['content'])
+  scenario.stage_changes
+  scenario.commit("Add #{file['name']}")
 end
 
 
 # Create a feature branch for the flooring and add each step for the flooring in a separate commit.
 
-g.branch('flooring').checkout
+scenario.create_branch('flooring')
 
-File.open('git-reset-soft/flooring.md', 'w') do | f |
-  f.puts "# Flooring\n"
-end
-
+scenario.create_file('flooring.md', "# Flooring\n")
 
 flooring_steps = [
   "Remove old flooring and adhesive",
@@ -79,11 +62,8 @@ flooring_steps = [
 ]
 
 flooring_steps.each do | step |
-  File.open('git-reset-soft/flooring.md', 'a') do | f |
-    f.puts "- #{step}"
-  end
-
-  g.add
-  g.commit("#{step}")
+  scenario.append_to_file('flooring.md', "- #{step}")
+  scenario.stage_changes
+  scenario.commit("#{step}")
 
 end
