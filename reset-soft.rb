@@ -24,7 +24,7 @@ explanation = "# Git Reset (soft)
 # Initialize an empty git repository
 scenario = GitMeThere::Scenario.new(name, explanation)
 
-initial_commit_id = g.log.first.sha[0..6]
+initial_commit_id = scenario.g.log.first.sha[0..6]
 
 
 # Create commits for each of the kitchen components being added
@@ -49,7 +49,7 @@ end
 
 # Create a feature branch for the flooring and add each step for the flooring in a separate commit.
 
-scenario.create_branch('flooring')
+scenario.checkout_branch('flooring')
 
 scenario.create_file('flooring.md', "# Flooring\n")
 
