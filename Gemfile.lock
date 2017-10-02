@@ -1,0 +1,16 @@
+GEM
+  remote: https://rubygems.org/
+  specs:
+    git (1.3.0)
+    gitmethere (0.1.3)
+      git (~> 1.2)
+
+PLATFORMS
+  ruby
+
+DEPENDENCIES
+  git
+  gitmethere
+
+BUNDLED WITH
+   1.14.4
